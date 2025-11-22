@@ -1,0 +1,14 @@
+[project]
+name = "tts-corpus-workbench"
+version = "0.1.0"
+description = "CLI tools for managing and validating TTS corpus"
+readme = "README.md"
+requires-python = ">=3.9"
+
+dependencies = [
+    "soundfile",
+    "mutagen"
+]
+
+[project.scripts]
+tts-corpus-workbench = "tts_corpus_workbench.cli:main"
