@@ -2,6 +2,7 @@ import argparse
 
 from .compute_audio_hours import compute_audio_hours
 from .find_orphan_audio import find_orphan_audio, delete_orphan_files
+from .detect_acronyms import detect_acronyms
 
 
 def build_parser():
@@ -16,6 +17,7 @@ def build_parser():
         required=True,
     )
 
+    # ---------- compute-audio-hours ----------
     p_hours = subparsers.add_parser(
         "compute-audio-hours",
         help="Compute total audio duration in a folder",
@@ -27,6 +29,7 @@ def build_parser():
     )
     p_hours.set_defaults(func=cmd_compute_audio_hours)
 
+    # ---------- find-orphan-audio ----------
     p_orphan = subparsers.add_parser(
         "find-orphan-audio",
         help="Compare metadata CSV with audio folder and find orphan/missing files",
@@ -57,6 +60,28 @@ def build_parser():
         help="Delete orphan files (present on disk but not in metadata)",
     )
     p_orphan.set_defaults(func=cmd_find_orphan_audio)
+
+    # ---------- detect-acronyms ----------
+    p_acro = subparsers.add_parser(
+        "detect-acronyms",
+        help="Scan CSV text column and export acronyms frequency stats",
+    )
+    p_acro.add_argument(
+        "--metadata",
+        required=True,
+        help="CSV file containing text data",
+    )
+    p_acro.add_argument(
+        "--text-col",
+        default="text",
+        help="Column name in CSV that stores text (default: text)",
+    )
+    p_acro.add_argument(
+        "--output",
+        required=True,
+        help="Output CSV path for acronyms stats",
+    )
+    p_acro.set_defaults(func=cmd_detect_acronym)
 
     return parser
 
@@ -114,6 +139,23 @@ def cmd_find_orphan_audio(args):
     if args.delete_orphan and orphan:
         deleted = delete_orphan_files(folder, result["orphan"])
         print(f"\nDeleted orphan files: {deleted}")
+
+
+def cmd_detect_acronym(args):
+    result = detect_acronyms(
+        metadata_csv=args.metadata,
+        text_col=args.text_col,
+        output_csv=args.output,
+    )
+
+    print("===========================================")
+    print("Acronym Stats")
+    print("===========================================")
+    print(f"Input CSV      : {result['input_csv']}")
+    print(f"Text column    : {result['text_col']}")
+    print(f"Output CSV     : {result['output_csv']}")
+    print(f"Unique entries : {result['unique_acronyms']}")
+    print("===========================================")
 
 
 def main():

@@ -1,5 +1,4 @@
 from pathlib import Path
-
 import soundfile as sf
 from mutagen import File as MutagenFile
 
